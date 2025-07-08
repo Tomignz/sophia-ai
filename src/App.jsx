@@ -37,9 +37,10 @@ export default function App() {
     }
 
     recognition.onerror = (e) => {
-      console.error('❌ Error en reconocimiento:', e)
-      setError(`Error de reconocimiento: ${e.error}`)
-    }
+  console.error('❌ Error en reconocimiento:', e.error); // 🔍 Tipo de error
+  console.error('📩 Mensaje del error:', e.message);     // 🔍 Descripción extra
+  setError(`Error de reconocimiento: ${e.error}`);
+}
 
     recognition.start()
     setIsListening(true)

@@ -6,26 +6,27 @@ export default function App() {
   const [isListening, setIsListening] = useState(false)
   const [error, setError] = useState(null)
 
-  const speak = (text) => {
-    const synth = window.speechSynthesis
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'es-AR'
+ const speak = (text) => {
+  const synth = window.speechSynthesis;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'es-AR';
 
-    const voices = synth.getVoices()
+  const assignVoice = () => {
+    const voices = synth.getVoices();
     const voice = voices.find(v =>
-      v.lang.startsWith('es') &&
-      (
-        v.name.toLowerCase().includes('mujer') ||
-        v.name.toLowerCase().includes('female') ||
-        v.name.toLowerCase().includes('soledad') ||
-        v.name.toLowerCase().includes('es-la')
-      )
-    ) || voices.find(v => v.lang.startsWith('es'))
+      v.lang.startsWith('es') && 
+      /female|mujer|soledad|google es/.test(v.name.toLowerCase())
+    ) || voices.find(v => v.lang.startsWith('es'));
+    if (voice) utterance.voice = voice;
+    synth.speak(utterance);
+  };
 
-    if (voice) utterance.voice = voice
-
-    synth.speak(utterance)
+  if (synth.getVoices().length > 0) {
+    assignVoice();
+  } else {
+    synth.onvoiceschanged = assignVoice;
   }
+};
 
   const callSophiaAI = async (text) => {
     try {

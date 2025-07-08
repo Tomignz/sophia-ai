@@ -6,7 +6,7 @@ function ParticleSphere({ isTalking }) {
   const [positions] = useState(() => {
     const temp = []
     const radius = 2
-    const count = 10000
+    const count = 9000
     for (let i = 0; i < count; i++) {
       const phi = Math.acos(2 * Math.random() - 1)
       const theta = 2 * Math.PI * Math.random()

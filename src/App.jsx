@@ -7,9 +7,33 @@ export default function App() {
   const [error, setError] = useState(null)
 
   const speak = (text) => {
+    const synth = window.speechSynthesis
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = 'es-AR'
-    speechSynthesis.speak(utterance)
+
+    const voices = synth.getVoices()
+    const voice = voices.find(v =>
+      v.lang.includes('es') && v.name.toLowerCase().includes('female')
+    ) || voices.find(v => v.lang.includes('es'))
+
+    if (voice) utterance.voice = voice
+
+    synth.speak(utterance)
+  }
+
+  const askSophia = async (text) => {
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text })
+      })
+      const data = await res.json()
+      if (data.reply) speak(data.reply)
+    } catch (e) {
+      console.error('❌ Error al contactar con Sophia:', e)
+      setError('Error al obtener respuesta de Sophia.')
+    }
   }
 
   const startRecognition = () => {
@@ -33,14 +57,17 @@ export default function App() {
         setIsTalking(true)
         speak('Hola Tomás, ¿cómo estás hoy?')
         setTimeout(() => setIsTalking(false), 4000)
+      } else {
+        setIsTalking(true)
+        askSophia(text)
+        setTimeout(() => setIsTalking(false), 5000)
       }
     }
 
     recognition.onerror = (e) => {
-  console.error('❌ Error en reconocimiento:', e.error); // 🔍 Tipo de error
-  console.error('📩 Mensaje del error:', e.message);     // 🔍 Descripción extra
-  setError(`Error de reconocimiento: ${e.error}`);
-}
+      console.error('❌ Error en reconocimiento:', e.error)
+      setError(`Error de reconocimiento: ${e.error}`)
+    }
 
     recognition.start()
     setIsListening(true)

@@ -13,26 +13,36 @@ export default function App() {
 
     const voices = synth.getVoices()
     const voice = voices.find(v =>
-      v.lang.includes('es') && v.name.toLowerCase().includes('female')
-    ) || voices.find(v => v.lang.includes('es'))
+      v.lang.startsWith('es') &&
+      (
+        v.name.toLowerCase().includes('mujer') ||
+        v.name.toLowerCase().includes('female') ||
+        v.name.toLowerCase().includes('soledad') ||
+        v.name.toLowerCase().includes('es-la')
+      )
+    ) || voices.find(v => v.lang.startsWith('es'))
 
     if (voice) utterance.voice = voice
 
     synth.speak(utterance)
   }
 
-  const askSophia = async (text) => {
+  const callSophiaAI = async (text) => {
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text })
+        body: JSON.stringify({ prompt: text }),
       })
       const data = await res.json()
-      if (data.reply) speak(data.reply)
-    } catch (e) {
-      console.error('❌ Error al contactar con Sophia:', e)
-      setError('Error al obtener respuesta de Sophia.')
+      if (data?.response) {
+        speak(data.response)
+      } else {
+        speak('Lo siento, no entendí eso.')
+      }
+    } catch (err) {
+      console.error('❌ Error al contactar con Sophia:', err)
+      speak('Uy, hubo un problema conectando con la nube.')
     }
   }
 
@@ -59,8 +69,8 @@ export default function App() {
         setTimeout(() => setIsTalking(false), 4000)
       } else {
         setIsTalking(true)
-        askSophia(text)
-        setTimeout(() => setIsTalking(false), 5000)
+        callSophiaAI(text)
+        setTimeout(() => setIsTalking(false), 6000)
       }
     }
 
@@ -95,13 +105,9 @@ export default function App() {
 
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4">
         <h1 className="text-2xl font-bold mb-4">Sophia Visual AI</h1>
-        <p className="text-sm opacity-70">Decí: <strong>"Hola Sophia"</strong></p>
-        {error && (
-          <p className="mt-4 text-red-500 text-sm">⚠️ {error}</p>
-        )}
-        {isListening && !error && (
-          <p className="text-green-400 mt-2 text-xs">🎙️ Escuchando...</p>
-        )}
+        <p className="text-sm opacity-70">Decí: <strong>"Hola Sophia"</strong> y hacé tu pregunta</p>
+        {error && <p className="mt-4 text-red-500 text-sm">⚠️ {error}</p>}
+        {isListening && !error && <p className="text-green-400 mt-2 text-xs">🎙️ Escuchando...</p>}
       </div>
     </div>
   )

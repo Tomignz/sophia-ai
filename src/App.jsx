@@ -5,41 +5,47 @@ export default function App() {
   const [isTalking, setIsTalking] = useState(false)
 
   useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition
-
-    if (!SpeechRecognition) {
-      alert('Este navegador no soporta reconocimiento de voz.')
-      return
-    }
-
-    const recognition = new SpeechRecognition()
-    recognition.lang = 'es-ES'
-    recognition.continuous = true
-    recognition.interimResults = false
-
-    recognition.onresult = (event) => {
-      const text = event.results[event.results.length - 1][0].transcript
-        .trim()
-        .toLowerCase()
-
-      console.log('🎤 Escuchado:', text)
-
-      if (text.includes('hola sophia') || text.includes('hola sofía')) {
-        console.log('🟢 Activada por voz')
-        setIsTalking(true)
-        speak('Hola Tomás, ¿cómo estás hoy?')
-        setTimeout(() => setIsTalking(false), 4000)
+    const handleFirstClick = () => {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      if (!SpeechRecognition) {
+        alert('Tu navegador no soporta reconocimiento de voz')
+        return
       }
+
+      const recognition = new SpeechRecognition()
+      recognition.lang = 'es-ES'
+      recognition.continuous = true
+      recognition.interimResults = false
+
+      recognition.onresult = (event) => {
+        const text = event.results[event.results.length - 1][0].transcript
+          .trim()
+          .toLowerCase()
+
+        console.log('🎤 Escuchado:', text)
+
+        if (text.includes('hola sophia') || text.includes('hola sofía')) {
+          console.log('🟢 Activada por voz')
+          setIsTalking(true)
+          speak('Hola Tomás, ¿cómo estás hoy?')
+          setTimeout(() => setIsTalking(false), 4000)
+        }
+      }
+
+      recognition.onerror = (e) => {
+        console.error('❌ Error en reconocimiento:', e)
+      }
+
+      recognition.start()
+      window.removeEventListener('click', handleFirstClick)
     }
 
-    recognition.onerror = (e) => {
-      console.error('❌ Error en reconocimiento:', e)
+    window.addEventListener('click', handleFirstClick)
+
+    // Limpieza al desmontar
+    return () => {
+      window.removeEventListener('click', handleFirstClick)
     }
-
-    recognition.start()
-
-    return () => recognition.stop()
   }, [])
 
   const speak = (text) => {

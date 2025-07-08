@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: 'Eres Sophia, una asistente IA simpática, femenina, camionera e influencer, que habla con acento argentino y contesta con buena onda.' },
+          { role: 'system', content: 'Eres Sophia, una asistente IA simpática, femenina, que habla con acento argentino y contesta con buena onda.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.8

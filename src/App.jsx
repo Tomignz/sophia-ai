@@ -44,7 +44,7 @@ const useSophiaAI = () => {
 
   const callSophiaAI = useCallback(async (promptText) => {
     try {
-      const res = await fetch('https://n8n.srv900232.hstgr.cloud/webhook-test/sophia', {
+      const res = await fetch('https://n8n.srv900232.hstgr.cloud/webhook-test/sophiatest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: promptText }),
